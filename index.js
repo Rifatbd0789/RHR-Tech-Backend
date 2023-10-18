@@ -25,12 +25,19 @@ async function run() {
     await client.connect();
     const productCollection = client.db("productDB").collection("products");
 
-    // to load specific data
+    // to load specific data based on brand
     app.get("/products/:brand", async (req, res) => {
       const brand = req.params.brand;
       //   console.log(brand);
       const query = { brand: brand };
       const result = await productCollection.find(query).toArray();
+      res.send(result);
+    });
+    app.get("/products/brand/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollection.findOne(query);
+      //   console.log("this is result", result);
       res.send(result);
     });
 
