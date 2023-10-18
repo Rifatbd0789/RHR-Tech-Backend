@@ -23,7 +23,9 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const productCollection = client.db("productDB").collection("products");
+    const database = client.db("productDB");
+    const productCollection = database.collection("products");
+    const addedProduct = database.collection("purchased");
 
     // to load specific data based on brand
     app.get("/products/:brand", async (req, res) => {
@@ -40,6 +42,18 @@ async function run() {
       //   console.log("this is result", result);
       res.send(result);
     });
+    // to load added data
+    app.get("/added", async (req, res) => {
+      const cursor = addedProduct.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // to load all data
+    app.get("/products", async (req, res) => {
+      const cursor = productCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     // add product to database and server
     app.post("/products", async (req, res) => {
@@ -47,10 +61,10 @@ async function run() {
       const result = await productCollection.insertOne(product);
       res.send(result);
     });
-    // to load all data
-    app.get("/products", async (req, res) => {
-      const cursor = productCollection.find();
-      const result = await cursor.toArray();
+    // add product after add to cart
+    app.post("/added", async (req, res) => {
+      const product = req.body;
+      const result = await addedProduct.insertOne(product);
       res.send(result);
     });
 
