@@ -67,10 +67,32 @@ async function run() {
       const result = await addedProduct.insertOne(product);
       res.send(result);
     });
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const newProduct = req.body;
+      const updateProduct = {
+        $set: {
+          name: newProduct.name,
+          brand: newProduct.brand,
+          type: newProduct.type,
+          price: newProduct.price,
+          photo: newProduct.photo,
+          rating: newProduct.rating,
+        },
+      };
+      const result = await productCollection.updateOne(
+        filter,
+        updateProduct,
+        options
+      );
+      res.send(result);
+    });
     // delete product after click delete
     app.delete("/added/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: id };
+      const query = { _id: new ObjectId(id) };
       const result = await addedProduct.deleteOne(query);
       res.send(result);
     });
